@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">SV OmniPro</string>
+    <string name="test_api">Prueba Omni Pro</string>
+    <string name="get_api_success">Información obtenida con éxito</string>
+    <string name="character">Personaje</string>
+    <string name="get_api_error">Error al obtener la información</string>
 </resources>
