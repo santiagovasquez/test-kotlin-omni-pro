@@ -11,9 +11,9 @@ import javax.inject.Inject
 class GetCharacterById @Inject constructor(
     private val repository: LoginRepository,
 ) {
-    operator fun invoke(page: Int): Flow<Resource<CharacterDetailDTO>> = flow {
+    operator fun invoke(characterId: Int): Flow<Resource<CharacterDetailDTO>> = flow {
         emit(Resource.Loading())
-        val characterDetail = repository.getCharacterById(page)
+        val characterDetail = repository.getCharacterById(characterId)
         emit(Resource.Success(characterDetail))
     }.catch {
         emit(Resource.Error(it.localizedMessage ?: "Unknown error"))

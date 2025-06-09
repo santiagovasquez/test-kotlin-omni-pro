@@ -13,7 +13,7 @@ class LoginRepositoryImpl @Inject constructor(
         return resDataSource.getCharacters(page)
     }
 
-    override suspend fun getCharacterById(page: Int): CharacterDetailDTO {
-        return resDataSource.getCharacterById(page)
+    override suspend fun getCharacterById(characterId: Int): CharacterDetailDTO {
+        return resDataSource.getCharacterById(characterId)
     }
 }

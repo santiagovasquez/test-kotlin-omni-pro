@@ -18,13 +18,13 @@ import javax.inject.Inject
 import com.example.svomnipro.R
 
 @HiltViewModel
-class characterDetailViewModel @Inject constructor(
+class CharacterDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val authUseCase: AuthUseCase
 ) : ViewModel() {
 
-    private val _state: MutableState<characterDetailState> = mutableStateOf(characterDetailState())
-    val state: State<characterDetailState> = _state
+    private val _state: MutableState<CharacterDetailState> = mutableStateOf(CharacterDetailState())
+    val state: State<CharacterDetailState> = _state
     private val characterId = savedStateHandle.get<String>("characterId")
 
     init {
@@ -35,9 +35,9 @@ class characterDetailViewModel @Inject constructor(
         }
     }
 
-    fun onEvent(event: characterDetailEvent) {
+    fun onEvent(event: CharacterDetailEvent) {
         when (event) {
-            is characterDetailEvent.OnClearSnack -> {
+            is CharacterDetailEvent.OnClearSnack -> {
                 _state.value = state.value.copy(showSnack = false, typeSnackBar = null)
             }
         }

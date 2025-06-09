@@ -13,7 +13,7 @@ import androidx.navigation.compose.composable
 import com.example.svomnipro.presentation.dashboard.SignInScreen
 import com.example.svomnipro.presentation.dashboard.DashboardViewModel
 import com.example.svomnipro.presentation.characterDetail.ContingencyScreen
-import com.example.svomnipro.presentation.characterDetail.characterDetailViewModel
+import com.example.svomnipro.presentation.characterDetail.CharacterDetailViewModel
 
 @SuppressLint("ContextCastToActivity")
 @RequiresApi(Build.VERSION_CODES.O)
@@ -44,7 +44,7 @@ fun RootNavigationGraph(navHostController: NavHostController) {
         }
 
         composable(Routes.CharacterDetail.route + "/{characterId}") {
-            val viewModel: characterDetailViewModel = hiltViewModel()
+            val viewModel: CharacterDetailViewModel = hiltViewModel()
             ContingencyScreen(
                 navController = navHostController,
                 viewModel = viewModel,

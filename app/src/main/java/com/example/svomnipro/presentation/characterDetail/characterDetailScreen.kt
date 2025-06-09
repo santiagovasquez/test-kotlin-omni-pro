@@ -48,15 +48,15 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.svomnipro.R
 import com.example.svomnipro.presentation.components.snackbar.CustomSnackBar
-import com.example.svomnipro.presentation.characterDetail.characterDetailEvent.OnClearSnack
+import com.example.svomnipro.presentation.characterDetail.CharacterDetailEvent.OnClearSnack
 import com.example.svomnipro.presentation.ui.theme.Primary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ContingencyScreen(
     navController: NavController,
-    viewModel: characterDetailViewModel,
-    onEvent: (characterDetailEvent) -> Unit,
+    viewModel: CharacterDetailViewModel,
+    onEvent: (CharacterDetailEvent) -> Unit,
 ) {
     val state = viewModel.state.value
     var isBackEnabled by remember { mutableStateOf(true) }
@@ -142,7 +142,7 @@ fun ContingencyScreen(
                                 CircularProgressIndicator(color = Primary)
                                 Spacer(modifier = Modifier.height(16.dp))
                                 Text(
-                                    text = "Obteniendo información ...",
+                                    text = stringResource(R.string.loading_message),
                                     fontSize = 16.sp,
                                     color = Primary,
                                     fontWeight = FontWeight.Medium
