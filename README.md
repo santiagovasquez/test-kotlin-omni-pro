@@ -1,6 +1,6 @@
 # SVOmniPro
 
-Proyecto Android basado en **Jetpack Compose** y **Clean Architecture**, que implementa buenas prácticas modernas como inyección de dependencias con **Hilt**, flujo de datos con **ViewModel + StateFlow**.
+Aplicación Android basada en Jetpack Compose y Clean Architecture que consume la API pública de Rick and Morty para mostrar personajes y detalles usando Hilt, ViewModel y Retrofit.
 
 ---
 
