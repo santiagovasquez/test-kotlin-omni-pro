@@ -11,4 +11,5 @@ data class DashboardState(
     val loading: Boolean = false,
     val typeSnackBar: TypeSnackBar? = null,
     val showSnack: Boolean = false,
+    val currentPage: Int = 1,
 )

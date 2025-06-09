@@ -34,8 +34,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -45,19 +45,22 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
 import com.example.svomnipro.presentation.ui.theme.Primary
-import com.example.svomnipro.R
 import com.example.svomnipro.data.remote.dto.CharacterDTO
 import com.example.svomnipro.presentation.components.snackbar.CustomSnackBar
 import com.example.svomnipro.presentation.navigation.Routes
 import com.example.svomnipro.presentation.dashboard.DashboardEvent.OnClearSnack
 import com.example.svomnipro.presentation.ui.theme.AquaBlueTransparent
+import com.example.svomnipro.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,33 +75,36 @@ fun SignInScreen(
 ) {
     val state = viewModel.state.value
     val hotState = remember { SnackbarHostState() }
+    val listState = rememberLazyListState()
 
-    if (state.showSnack) {
-        LaunchedEffect(true) {
-            if (state.showSnack) {
-                try {
-                    when (hotState.showSnackbar(
-                        message = "show"
-                    )) {
-                        SnackbarResult.Dismissed -> {
-                            onEvent(OnClearSnack)
-                        }
 
-                        else -> {}
-                    }
-                } finally {
-                    onEvent(OnClearSnack)
-                }
-            }
+    val isAtBottom = remember {
+        derivedStateOf {
+            val lastVisibleItemIndex = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
+            val totalItems = listState.layoutInfo.totalItemsCount
+            lastVisibleItemIndex >= totalItems - 1 && totalItems > 0
         }
     }
+
+    if (!state.loading) {
+        LaunchedEffect(isAtBottom) {
+            snapshotFlow { isAtBottom.value }
+                .collect { atBottom ->
+                    if (atBottom) {
+                        viewModel.loadNextPage()
+                    }
+                }
+        }
+    }
+
+
+
 
     viewModel.navController.value = navController
 
     BackHandler(enabled = true) {
         onCloseApp()
     }
-
 
     Scaffold(
         topBar = {
@@ -137,6 +143,32 @@ fun SignInScreen(
             }
         },
         content = { paddingValues ->
+
+            if (state.loading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.3f))
+                        .pointerInput(Unit) { }
+                        .zIndex(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator(color = Primary)
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Text(
+                            text = stringResource(R.string.loading_message),
+                            fontSize = 16.sp,
+                            color = Primary,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+            }
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -144,43 +176,39 @@ fun SignInScreen(
                     .background(Color.White)
             ) {
                 LazyColumn(
+                    state = listState,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 16.dp, end = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    if (state.loading) {
-                        item {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(Color.White),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center
-                                ) {
-                                    CircularProgressIndicator(color = Primary)
-                                    Spacer(modifier = Modifier.height(20.dp))
-                                    Text(
-                                        text = "Obteniendo información ...",
-                                        fontSize = 16.sp,
-                                        color = Primary,
-                                        fontWeight = FontWeight.Medium
-                                    )
-                                }
-                            }
-                        }
-                    } else {
-                        items(state.characters) { character ->
-                            PreviewCardCharacter(character, onSelectCharacter)
-                        }
+                    items(state.characters) { character ->
+                        PreviewCardCharacter(character, onSelectCharacter)
                     }
                 }
             }
         }
     )
+
+    if (state.showSnack) {
+        LaunchedEffect(true) {
+            if (state.showSnack) {
+                try {
+                    when (hotState.showSnackbar(
+                        message = "show"
+                    )) {
+                        SnackbarResult.Dismissed -> {
+                            onEvent(OnClearSnack)
+                        }
+
+                        else -> {}
+                    }
+                } finally {
+                    onEvent(OnClearSnack)
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -232,38 +260,6 @@ fun PreviewCardCharacter(character: CharacterDTO, onSelectCharacter: (Int) -> Un
         }
     }
 
-}
-
-
-@Composable
-private fun HeaderInformation(
-    modifier: Modifier = Modifier,
-    onCloseApp: () -> Unit,
-) {
-    Row(
-        modifier = modifier.background(Color.White),
-        horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(onClick = { onCloseApp() }) {
-            Icon(
-                imageVector = Icons.Default.Clear,
-                contentDescription = null,
-                tint = Primary,
-                modifier = Modifier.clickable {
-                    onCloseApp()
-                }
-            )
-        }
-        Text(
-            text = stringResource(R.string.test_api),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Primary,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
-    }
 }
 
 @Preview(showBackground = true)

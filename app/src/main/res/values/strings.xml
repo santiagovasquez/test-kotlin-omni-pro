@@ -4,4 +4,5 @@
     <string name="get_api_success">Información obtenida con éxito</string>
     <string name="character">Personaje</string>
     <string name="get_api_error">Error al obtener la información</string>
+    <string name="loading_message">Obteniendo información …</string>
 </resources>

@@ -26,7 +26,6 @@ class DashboardViewModel @Inject constructor(
 
     private val _state = mutableStateOf(DashboardState())
     val state: State<DashboardState> = _state
-    val message: MutableState<String> = mutableStateOf("")
     val navController: MutableState<NavController?> = mutableStateOf(null)
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
@@ -43,28 +42,34 @@ class DashboardViewModel @Inject constructor(
         }
     }
 
-    private fun getCharacters() {
-        authUseCase.getCharacters.invoke().onEach { resource ->
+    fun loadNextPage() {
+        val nextPage = state.value.currentPage + 1
+        getCharacters(nextPage)
+    }
+
+    private fun getCharacters(page: Int = state.value.currentPage) {
+        authUseCase.getCharacters.invoke(page).onEach { resource ->
             when (resource) {
                 is Resource.Loading -> showLoading()
-
                 is Resource.Error -> {
                     hideLoading()
                     onErrorResource(R.string.get_api_error)
                 }
-
                 is Resource.Success -> {
                     resource.data?.let { result ->
                         _state.value = state.value.copy(
-                            characters = result.results,
+                            characters = state.value.characters + result.results,
+                            currentPage = page,
                             loading = false
                         )
+
                         onSuccess(R.string.get_api_success)
                     }
                 }
             }
         }.launchIn(viewModelScope)
     }
+
 
     private fun onErrorResource(@StringRes message: Int) {
         _state.value = state.value.copy(
