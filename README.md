@@ -23,17 +23,19 @@ Este proyecto sigue el patrón **Clean Architecture** con 3 capas principales:
 - **Asincronía:** Coroutines + StateFlow
 
 
-
-
 ## ▶️ Cómo ejecutar
 
 1. Clona el repositorio:
    ```bash
    git clone https://github.com/santiagovasquez/test-kotlin-omni-pro.git
    ```
-2. Abre el proyecto en Android Studio.
-3. Ejecuta en un emulador o dispositivo real.
-4. ¡Listo!
+2. pasate a la rama develop
+   ```bash
+   git checkout develop
+   ```
+3. Abre el proyecto en Android Studio.
+4. Ejecuta en un emulador o dispositivo real.
+5. ¡Listo!
 
 ---
 
